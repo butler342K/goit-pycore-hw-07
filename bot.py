@@ -8,14 +8,12 @@ class Field:
         return str(self.value)
 
 class Name(Field):
-    # реалізація класу
     def __init__(self, value):
         if not isinstance(value, str) or not value.strip():
             raise ValueError("Name must be a non-empty string.")
         self.value = value.strip()
 
 class Phone(Field):
-    # реалізація класу
     def __init__(self, phone):
         if not isinstance(phone, str) or not phone.strip():
             raise ValueError("Phone must be a non-empty string.")
@@ -34,8 +32,6 @@ class Birthday(Field):
             self.value = datetime.strptime(value, "%d.%m.%Y")
             if self.value.year < 1900 or self.value > datetime.now():
                 raise ValueError("Year must be between 1900 and the current year.")
-            # Додайте перевірку коректності даних
-            # та перетворіть рядок на об'єкт datetime
         except ValueError as e:
             if "does not match format" in str(e):
                 raise ValueError("Invalid date format. Use DD.MM.YYYY")
@@ -69,7 +65,7 @@ class Record:
         self.birthday = Birthday(birthday)
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
-        # show all information about contact    
+        # == show full information about contact ==   
         # return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, Birthday: {self.birthday.value.strftime('%d.%m.%Y') if self.birthday else 'Not set'}"
 
 
@@ -122,54 +118,6 @@ class AddressBook(UserDict):
                 upcoming_birthdays.append(user)
         return upcoming_birthdays
 
-# print('Task 4: Upcoming birthdays')
-# users = [
-#     {"name": "John Doe", "birthday": "1985.01.23"},
-#     {"name": "Jane Smith", "birthday": "1990.01.27"},
-#     {"name": "Alex Reva", "birthday": "1992.07.12"},
-#     {"name": "Forest Gump", "birthday": "1988.07.10"},
-# ]
-# upcoming_birthdays = get_upcoming_birthdays(users)
-# print("Список привітань на цьому тижні:", upcoming_birthdays)
-
-# Створення нової адресної книги
-# book = AddressBook()
-
-# # Створення запису для John
-# john_record = Record("John")
-# john_record.add_phone("1234567890")
-# john_record.add_phone("5555555555")
-
-# # Додавання запису John до адресної книги
-# book.add_record(john_record)
-
-# # Створення та додавання нового запису для Jane
-# jane_record = Record("Jane")
-# jane_record.add_phone("9876543210")
-# jane_record.add_birthday("12.07.1986")  # Додавання дати народження
-# book.add_record(jane_record)
-# book.get_upcoming_birthday()  # Отримання майбутніх днів народження
-
-# # Виведення всіх записів у книзі
-# for name, record in book.data.items():
-#     print(record)
-
-# # Знаходження та редагування телефону для John
-# john = book.find("John")
-# john.edit_phone("1234567890", "1112223333")
-
-# print(john)  # Виведення: Contact name: John, phones: 1112223333; 5555555555
-
-# # Пошук конкретного телефону у записі John
-# found_phone = john.find_phone("5555555555")
-# print(f"{john.name}: {found_phone}")  # Виведення: 5555555555
-
-# # Видалення запису Jane
-# book.delete("Jane") 
-        
-#==========================================
-# Old bot code
-
 def input_error(func):
     def inner(*args, **kwargs):
         try:
@@ -178,10 +126,14 @@ def input_error(func):
             return """Invalid input. Format: 
             add <name> <phone_number>
             change <name> <old_phone> <new_phone>
-            phone <name>."""
-        except IndexError:
+            phone <name>
+            add-birthday <name> <DD.MM.YYYY>
+            show-birthday <name>
+            birthdays
+            all"""
+        except IndexError: # not used now
             return "Invalid input. Format: phone <name>."
-        except KeyError:
+        except KeyError: # not used now
             return "Contact not found."
         except Exception as e:
             return f"An unexpected error occurred: {e}"
@@ -229,9 +181,9 @@ def show_phone(args, book: AddressBook):
 def show_all(book: AddressBook):
     if not book.data:
         print("No contacts available.")
-    print("All contacts:\n")
+        return
+    print("📗 All contacts: 📗\n")
     for name, record in book.data.items():
-        # list += f"{record.name.value}: {', '.join(str(phone) for phone in record.phones)}\n"
         print(record)  
 
 @input_error
@@ -259,13 +211,12 @@ def upcoming_birthdays(book: AddressBook):
     upcoming_birthdays = book.get_upcoming_birthday()
     if not upcoming_birthdays:
         print("No upcoming birthdays.")
-    print("Upcoming birthdays:")
+    print("🎉 Upcoming birthdays: 🎉")
     for record in upcoming_birthdays:
         birthday = record.birthday.value
-        print(f"{record.name.value}: {birthday.strftime('%d.%m')}")
+        print(f"{record.name.value}: {birthday.strftime('%d.%m')}") #  Show only day and month
 
 def main():
-    # contacts = {}
     book = AddressBook()
     print("Welcome to the assistant bot!")
     while True:
